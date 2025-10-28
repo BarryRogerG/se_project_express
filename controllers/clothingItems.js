@@ -70,8 +70,82 @@ const deleteClothingItem = (req, res) => {
     });
 };
 
+// Like a clothing item
+const likeClothingItem = (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user._id;
+
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $addToSet: { likes: userId } },
+    { new: true }
+  )
+    .orFail(() => {
+      const error = new Error("Item ID not found");
+      error.statusCode = ERROR_CODE.NOT_FOUND;
+      throw error;
+    })
+    .then((item) => {
+      res.send(item);
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res
+          .status(ERROR_CODE.BAD_REQUEST)
+          .send({ message: "Invalid item ID" });
+      }
+      if (err.statusCode === ERROR_CODE.NOT_FOUND) {
+        return res
+          .status(ERROR_CODE.NOT_FOUND)
+          .send({ message: "Item not found" });
+      }
+      res
+        .status(ERROR_CODE.INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
+};
+
+// Unlike a clothing item
+const unlikeClothingItem = (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user._id;
+
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $pull: { likes: userId } },
+    { new: true }
+  )
+    .orFail(() => {
+      const error = new Error("Item ID not found");
+      error.statusCode = ERROR_CODE.NOT_FOUND;
+      throw error;
+    })
+    .then((item) => {
+      res.send(item);
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res
+          .status(ERROR_CODE.BAD_REQUEST)
+          .send({ message: "Invalid item ID" });
+      }
+      if (err.statusCode === ERROR_CODE.NOT_FOUND) {
+        return res
+          .status(ERROR_CODE.NOT_FOUND)
+          .send({ message: "Item not found" });
+      }
+      res
+        .status(ERROR_CODE.INTERNAL_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
+    });
+};
+
 module.exports = {
   getClothingItems,
   createClothingItem,
   deleteClothingItem,
+  likeClothingItem,
+  unlikeClothingItem,
 };
