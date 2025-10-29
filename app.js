@@ -22,6 +22,6 @@ app.use(handleNotFound);
 app.use(handleError);
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`App listening at port ${PORT}`);
 });
