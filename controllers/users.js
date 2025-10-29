@@ -8,9 +8,7 @@ const sampleUsers = [
 ];
 
 // GET /users - get all users
-const getUsers = (req, res) => {
-  return res.json(sampleUsers);
-};
+const getUsers = (req, res) => res.json(sampleUsers);
 
 // GET /users/:userId - get user by ID
 const getUserById = (req, res) => {

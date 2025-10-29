@@ -23,9 +23,7 @@ const handleError = (err, req, res) => {
 };
 
 // 404 handler
-const handleNotFound = (req, res) => {
-  return res.status(404).json({ message: "Route not found" });
-};
+const handleNotFound = (req, res) => res.status(404).json({ message: "Route not found" });
 
 module.exports = {
   handleError,

@@ -33,9 +33,7 @@ const sampleItems = [
 ];
 
 // GET /items - get all clothing items
-const getClothingItems = (req, res) => {
-  res.json(sampleItems);
-};
+const getClothingItems = (req, res) => res.json(sampleItems);
 
 // POST /items - create a new clothing item
 const createClothingItem = (req, res) => {
