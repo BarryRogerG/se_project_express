@@ -9,7 +9,7 @@ const sampleUsers = [
 
 // GET /users - get all users
 const getUsers = (req, res) => {
-  res.json(sampleUsers);
+  return res.json(sampleUsers);
 };
 
 // GET /users/:userId - get user by ID
@@ -21,7 +21,7 @@ const getUserById = (req, res) => {
     return res.status(404).json({ message: "User not found" });
   }
   
-  res.json(user);
+  return res.json(user);
 };
 
 // POST /users - create a new user
@@ -58,7 +58,7 @@ const createUser = (req, res) => {
   };
   
   sampleUsers.push(newUser);
-  res.status(201).json(newUser);
+  return res.status(201).json(newUser);
 };
 
 module.exports = {

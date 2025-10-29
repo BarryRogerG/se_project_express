@@ -74,7 +74,7 @@ const createClothingItem = (req, res) => {
   };
   
   sampleItems.push(newItem);
-  res.status(201).json(newItem);
+  return res.status(201).json(newItem);
 };
 
 // DELETE /items/:itemId - delete a clothing item
@@ -87,39 +87,39 @@ const deleteClothingItem = (req, res) => {
   }
   
   sampleItems.splice(index, 1);
-  res.json({ message: "Item deleted successfully" });
+  return res.json({ message: "Item deleted successfully" });
 };
 
 // PUT /items/:itemId/likes - like a clothing item
 const likeItem = (req, res) => {
   const { itemId } = req.params;
-  const item = sampleItems.find((item) => item._id === itemId);
+  const foundItem = sampleItems.find((item) => item._id === itemId);
   
-  if (!item) {
+  if (!foundItem) {
     return res.status(404).json({ message: "Item not found" });
   }
   
   const userId = "5d8b8592978f8bd833ca8133";
-  if (!item.likes.includes(userId)) {
-    item.likes.push(userId);
+  if (!foundItem.likes.includes(userId)) {
+    foundItem.likes.push(userId);
   }
   
-  res.json(item);
+  return res.json(foundItem);
 };
 
 // DELETE /items/:itemId/likes - unlike a clothing item
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
-  const item = sampleItems.find((item) => item._id === itemId);
+  const foundItem = sampleItems.find((item) => item._id === itemId);
   
-  if (!item) {
+  if (!foundItem) {
     return res.status(404).json({ message: "Item not found" });
   }
   
   const userId = "5d8b8592978f8bd833ca8133";
-  item.likes = item.likes.filter((id) => id !== userId);
+  foundItem.likes = foundItem.likes.filter((id) => id !== userId);
   
-  res.json(item);
+  return res.json(foundItem);
 };
 
 module.exports = {

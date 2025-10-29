@@ -1,7 +1,5 @@
 // Error handling middleware
-const handleError = (err, req, res, next) => {
-  console.error(err.stack);
-  
+const handleError = (err, req, res) => {
   // Default error
   let status = 500;
   let message = "Internal Server Error";
@@ -18,7 +16,7 @@ const handleError = (err, req, res, next) => {
     message = err.message;
   }
   
-  res.status(status).json({
+  return res.status(status).json({
     message,
     ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
@@ -26,7 +24,7 @@ const handleError = (err, req, res, next) => {
 
 // 404 handler
 const handleNotFound = (req, res) => {
-  res.status(404).json({ message: "Route not found" });
+  return res.status(404).json({ message: "Route not found" });
 };
 
 module.exports = {
