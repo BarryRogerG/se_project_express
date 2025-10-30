@@ -5,7 +5,8 @@ const routes = require("./routes");
 const { handleError, handleNotFound } = require("./utils/errors");
 
 const app = express();
-const { PORT = 3001, MONGODB_URI = "mongodb://localhost:27017/wtwr_db" } = process.env;
+const { PORT = 3001, MONGODB_URI = "mongodb://localhost:27017/wtwr_db" } =
+  process.env;
 
 // Enable CORS for all routes
 app.use(cors());

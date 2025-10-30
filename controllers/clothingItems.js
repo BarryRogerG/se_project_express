@@ -35,6 +35,18 @@ const sampleItems = [
 // GET /items - get all clothing items
 const getClothingItems = (req, res) => res.json(sampleItems);
 
+// GET /items/:itemId - get a single clothing item
+const getClothingItemById = (req, res) => {
+  const { itemId } = req.params;
+  const item = sampleItems.find((item) => item._id === itemId);
+  
+  if (!item) {
+    return res.status(404).json({ message: "Item not found" });
+  }
+  
+  return res.json(item);
+};
+
 // POST /items - create a new clothing item
 const createClothingItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -86,12 +98,6 @@ const createClothingItem = (req, res) => {
 // DELETE /items/:itemId - delete a clothing item
 const deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
-  
-  // Validate ID format (should be a valid MongoDB ObjectId format)
-  if (!/^[0-9a-fA-F]{24}$/.test(itemId) && itemId.length < 100) {
-    return res.status(400).json({ message: "Invalid item ID format" });
-  }
-  
   const index = sampleItems.findIndex((item) => item._id === itemId);
   
   if (index === -1) {
@@ -105,12 +111,6 @@ const deleteClothingItem = (req, res) => {
 // PUT /items/:itemId/likes - like a clothing item
 const likeItem = (req, res) => {
   const { itemId } = req.params;
-  
-  // Validate ID format
-  if (!/^[0-9a-fA-F]{24}$/.test(itemId) && itemId.length < 100) {
-    return res.status(400).json({ message: "Invalid item ID format" });
-  }
-  
   const foundItem = sampleItems.find((item) => item._id === itemId);
   
   if (!foundItem) {
@@ -128,12 +128,6 @@ const likeItem = (req, res) => {
 // DELETE /items/:itemId/likes - unlike a clothing item
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
-  
-  // Validate ID format
-  if (!/^[0-9a-fA-F]{24}$/.test(itemId) && itemId.length < 100) {
-    return res.status(400).json({ message: "Invalid item ID format" });
-  }
-  
   const foundItem = sampleItems.find((item) => item._id === itemId);
   
   if (!foundItem) {
@@ -148,6 +142,7 @@ const unlikeItem = (req, res) => {
 
 module.exports = {
   getClothingItems,
+  getClothingItemById,
   createClothingItem,
   deleteClothingItem,
   likeItem,
