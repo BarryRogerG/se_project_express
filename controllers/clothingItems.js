@@ -1,5 +1,3 @@
-const mongoose = require("mongoose");
-
 // Helper function to validate ID format
 const isValidId = (id) => {
   // Common invalid ID patterns that should return 400
