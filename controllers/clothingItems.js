@@ -38,7 +38,7 @@ const getClothingItems = (req, res) => res.json(sampleItems);
 // GET /items/:itemId - get a single clothing item
 const getClothingItemById = (req, res) => {
   const { itemId } = req.params;
-  const item = sampleItems.find((item) => item._id === itemId);
+  const item = sampleItems.find((i) => i._id === itemId);
   
   if (!item) {
     return res.status(404).json({ message: "Item not found" });
