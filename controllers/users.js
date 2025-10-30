@@ -1,5 +1,3 @@
-const mongoose = require("mongoose");
-
 // Sample data - in a real app, this would come from a database
 const sampleUsers = [
   {
@@ -15,12 +13,6 @@ const getUsers = (req, res) => res.json(sampleUsers);
 // GET /users/:userId - get user by ID
 const getUserById = (req, res) => {
   const { userId } = req.params;
-  
-  // Validate ID format first
-  if (!mongoose.isValidObjectId(userId)) {
-    return res.status(400).json({ message: "Invalid user ID format" });
-  }
-  
   const user = sampleUsers.find((u) => u._id === userId);
   
   if (!user) {
