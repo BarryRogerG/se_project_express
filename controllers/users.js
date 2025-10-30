@@ -20,7 +20,7 @@ const isValidId = (id) => {
 const sampleUsers = [
   {
     _id: "5d8b8592978f8bd833ca8133",
-    name: "Test User",
+    name: "test",
     avatar: "https://example.com/avatar.jpg",
   },
 ];
