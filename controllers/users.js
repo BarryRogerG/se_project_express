@@ -67,6 +67,21 @@ const createUser = (req, res) => {
     return res.status(400).json({ message: "Name must be no more than 30 characters" });
   }
   
+  // Validate URL format (stronger checks for avatar)
+  try {
+    const url = new URL(avatar);
+    // require http or https
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return res.status(400).json({ message: "Invalid URL" });
+    }
+    // basic hostname sanity check (reject relative URLs like "foo" or empty host)
+    if (!url.hostname || !url.hostname.includes(".")) {
+      return res.status(400).json({ message: "Invalid URL" });
+    }
+  } catch (e) {
+    return res.status(400).json({ message: "Invalid URL" });
+  }
+  
   // Check if user already exists (but allow duplicates with name "test" for testing)
   const existingUser = sampleUsers.find((u) => u.name === name.trim());
   if (existingUser && name.trim() !== "test") {
