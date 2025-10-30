@@ -61,6 +61,13 @@ const createClothingItem = (req, res) => {
     return res.status(400).json({ message: "Invalid weather type" });
   }
   
+  // Validate URL format
+  try {
+    new URL(imageUrl);
+  } catch (e) {
+    return res.status(400).json({ message: "Invalid URL" });
+  }
+  
   const newItem = {
     _id: Date.now().toString(),
     name: name.trim(),
@@ -78,6 +85,12 @@ const createClothingItem = (req, res) => {
 // DELETE /items/:itemId - delete a clothing item
 const deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
+  
+  // Validate ID format (should be a valid MongoDB ObjectId format)
+  if (!/^[0-9a-fA-F]{24}$/.test(itemId) && itemId.length < 100) {
+    return res.status(400).json({ message: "Invalid item ID format" });
+  }
+  
   const index = sampleItems.findIndex((item) => item._id === itemId);
   
   if (index === -1) {
@@ -91,6 +104,12 @@ const deleteClothingItem = (req, res) => {
 // PUT /items/:itemId/likes - like a clothing item
 const likeItem = (req, res) => {
   const { itemId } = req.params;
+  
+  // Validate ID format
+  if (!/^[0-9a-fA-F]{24}$/.test(itemId) && itemId.length < 100) {
+    return res.status(400).json({ message: "Invalid item ID format" });
+  }
+  
   const foundItem = sampleItems.find((item) => item._id === itemId);
   
   if (!foundItem) {
@@ -108,6 +127,12 @@ const likeItem = (req, res) => {
 // DELETE /items/:itemId/likes - unlike a clothing item
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
+  
+  // Validate ID format
+  if (!/^[0-9a-fA-F]{24}$/.test(itemId) && itemId.length < 100) {
+    return res.status(400).json({ message: "Invalid item ID format" });
+  }
+  
   const foundItem = sampleItems.find((item) => item._id === itemId);
   
   if (!foundItem) {
