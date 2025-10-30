@@ -13,6 +13,12 @@ app.use(cors());
 // Parse JSON bodies
 app.use(express.json());
 
+// Set user ID middleware
+app.use((req, res, next) => {
+  req.user = { _id: "5d8b8592978f8bd833ca8133" };
+  next();
+});
+
 // Use routes
 app.use("/", routes);
 
