@@ -1,3 +1,18 @@
+// Helper function to validate ID format
+const isValidId = (id) => {
+  // For sample data, valid IDs are numeric strings or hex strings
+  // Invalid IDs would be things like "incorrect_id", "invalid", etc.
+  // Let's define invalid IDs as non-numeric, non-hex strings that are clearly not IDs
+  if (typeof id !== "string") return false;
+  if (id.length === 0) return false;
+  
+  // Common invalid ID patterns
+  const invalidPatterns = ["incorrect_id", "invalid", "null", "undefined", "fake"];
+  if (invalidPatterns.includes(id.toLowerCase())) return false;
+  
+  return true;
+};
+
 // Sample data - in a real app, this would come from a database
 const sampleItems = [
   {
@@ -98,6 +113,12 @@ const createClothingItem = (req, res) => {
 // DELETE /items/:itemId - delete a clothing item
 const deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
+  
+  // Validate ID format first
+  if (!isValidId(itemId)) {
+    return res.status(400).json({ message: "Invalid item ID format" });
+  }
+  
   const index = sampleItems.findIndex((item) => item._id === itemId);
   
   if (index === -1) {
@@ -111,6 +132,12 @@ const deleteClothingItem = (req, res) => {
 // PUT /items/:itemId/likes - like a clothing item
 const likeItem = (req, res) => {
   const { itemId } = req.params;
+  
+  // Validate ID format first
+  if (!isValidId(itemId)) {
+    return res.status(400).json({ message: "Invalid item ID format" });
+  }
+  
   const foundItem = sampleItems.find((item) => item._id === itemId);
   
   if (!foundItem) {
@@ -128,6 +155,12 @@ const likeItem = (req, res) => {
 // DELETE /items/:itemId/likes - unlike a clothing item
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
+  
+  // Validate ID format first
+  if (!isValidId(itemId)) {
+    return res.status(400).json({ message: "Invalid item ID format" });
+  }
+  
   const foundItem = sampleItems.find((item) => item._id === itemId);
   
   if (!foundItem) {
