@@ -11,16 +11,9 @@ const isValidId = (id) => {
   const hexPattern = /^[0-9a-fA-F]{24}$/;
   const numericPattern = /^[0-9]+$/;
   
-  // Allow valid ObjectId format or numeric strings
-  if (hexPattern.test(id) || numericPattern.test(id)) return true;
-  
-  // For now, allow other strings (compatibility with sample data)
-  // but reject obviously invalid ones
-  if (id.includes("invalid") || id.includes("incorrect") || id === "null" || id === "undefined") {
-    return false;
-  }
-  
-  return true;
+  // Only allow valid ObjectId format or numeric strings
+  // Reject everything else
+  return hexPattern.test(id) || numericPattern.test(id);
 };
 
 // Sample data - in a real app, this would come from a database
