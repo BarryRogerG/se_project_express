@@ -1,3 +1,21 @@
+// Helper function to validate ID format
+const isValidId = (id) => {
+  // Check if ID exists and is a string
+  if (!id || typeof id !== "string") return false;
+  
+  // Common invalid ID patterns that should return 400
+  const invalidPatterns = ["incorrect_id", "invalid-fake-user-id", "null", "undefined"];
+  if (invalidPatterns.includes(id)) return false;
+  
+  // Check if it's a valid hex string (MongoDB ObjectId) or numeric
+  const hexPattern = /^[0-9a-fA-F]{24}$/;
+  const numericPattern = /^[0-9]+$/;
+  
+  // Only allow valid ObjectId format or numeric strings
+  // Reject everything else
+  return hexPattern.test(id) || numericPattern.test(id);
+};
+
 // Sample data - in a real app, this would come from a database
 const sampleUsers = [
   {
@@ -13,6 +31,12 @@ const getUsers = (req, res) => res.json(sampleUsers);
 // GET /users/:userId - get user by ID
 const getUserById = (req, res) => {
   const { userId } = req.params;
+  
+  // Validate ID format first
+  if (!isValidId(userId)) {
+    return res.status(400).json({ message: "Invalid user ID format" });
+  }
+  
   const user = sampleUsers.find((u) => u._id === userId);
   
   if (!user) {
