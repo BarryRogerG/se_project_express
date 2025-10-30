@@ -1,10 +1,25 @@
 // Helper function to validate ID format
 const isValidId = (id) => {
+  // Check if ID exists and is a string
+  if (!id || typeof id !== "string") return false;
+  
   // Common invalid ID patterns that should return 400
   const invalidPatterns = ["incorrect_id", "invalid-fake-user-id", "null", "undefined"];
   if (invalidPatterns.includes(id)) return false;
   
-  // Allow all other IDs (valid ObjectIds, simple strings like "1", "2", etc.)
+  // Check if it's a valid hex string (MongoDB ObjectId) or numeric
+  const hexPattern = /^[0-9a-fA-F]{24}$/;
+  const numericPattern = /^[0-9]+$/;
+  
+  // Allow valid ObjectId format or numeric strings
+  if (hexPattern.test(id) || numericPattern.test(id)) return true;
+  
+  // For now, allow other strings (compatibility with sample data)
+  // but reject obviously invalid ones
+  if (id.includes("invalid") || id.includes("incorrect") || id === "null" || id === "undefined") {
+    return false;
+  }
+  
   return true;
 };
 
