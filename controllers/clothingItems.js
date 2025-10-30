@@ -63,7 +63,8 @@ const createClothingItem = (req, res) => {
   
   // Validate URL format
   try {
-    new URL(imageUrl);
+    const url = new URL(imageUrl);
+    if (!url) return res.status(400).json({ message: "Invalid URL" });
   } catch (e) {
     return res.status(400).json({ message: "Invalid URL" });
   }

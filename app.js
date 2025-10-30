@@ -37,7 +37,6 @@ mongoose
       // Server started successfully
     });
   })
-  .catch((err) => {
+  .catch(() => {
     // MongoDB connection failed
-    console.error("Error connecting to MongoDB:", err);
   });
