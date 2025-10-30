@@ -28,16 +28,16 @@ const sampleUsers = [
 // GET /users - get all users
 const getUsers = (req, res) => res.json(sampleUsers);
 
-// GET /users/:userId - get user by ID
+// GET /users/:_id - get user by ID
 const getUserById = (req, res) => {
-  const { userId } = req.params;
+  const { _id } = req.params;
   
   // Validate ID format first
-  if (!isValidId(userId)) {
+  if (!isValidId(_id)) {
     return res.status(400).json({ message: "Invalid user ID format" });
   }
   
-  const user = sampleUsers.find((u) => u._id === userId);
+  const user = sampleUsers.find((u) => u._id === _id);
   
   if (!user) {
     return res.status(404).json({ message: "User not found" });
