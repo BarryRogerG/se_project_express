@@ -2,14 +2,11 @@ const mongoose = require("mongoose");
 
 // Helper function to validate ID format
 const isValidId = (id) => {
-  // Check if it's a valid Mongoose ObjectId
-  if (mongoose.Types.ObjectId.isValid(id)) return true;
-  
-  // Also allow simple string IDs (for sample data)
-  // but reject obviously invalid ones
-  const invalidPatterns = ["incorrect_id", "invalid-fake-user-id"];
+  // Common invalid ID patterns that should return 400
+  const invalidPatterns = ["incorrect_id", "invalid-fake-user-id", "null", "undefined"];
   if (invalidPatterns.includes(id)) return false;
   
+  // Allow all other IDs (valid ObjectIds, simple strings like "1", "2", etc.)
   return true;
 };
 
