@@ -91,10 +91,17 @@ const createClothingItem = (req, res) => {
     return res.status(400).json({ message: "Invalid weather type" });
   }
   
-  // Validate URL format
+  // Validate URL format (stronger checks)
   try {
     const url = new URL(imageUrl);
-    if (!url) return res.status(400).json({ message: "Invalid URL" });
+    // require http or https
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return res.status(400).json({ message: "Invalid URL" });
+    }
+    // basic hostname sanity check (reject relative URLs like "foo" or empty host)
+    if (!url.hostname || !url.hostname.includes(".")) {
+      return res.status(400).json({ message: "Invalid URL" });
+    }
   } catch (e) {
     return res.status(400).json({ message: "Invalid URL" });
   }
