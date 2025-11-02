@@ -1,5 +1,5 @@
 // Error handling middleware
-const handleError = (err, req, res, next) => {
+const handleError = (err, req, res) => {
   // Default error
   let status = 500;
   let message = "Internal Server Error";
