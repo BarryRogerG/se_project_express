@@ -1,5 +1,5 @@
 // Error handling middleware
-const handleError = (err, req, res) => {
+const handleError = (err, req, res, next) => {
   // Default error
   let status = 500;
   let message = "Internal Server Error";
@@ -11,6 +11,9 @@ const handleError = (err, req, res) => {
   } else if (err.name === "CastError") {
     status = 400;
     message = "Invalid ID format";
+  } else if (err.name === "DocumentNotFoundError") {
+    status = 404;
+    message = "Not found";
   } else if (err.status) {
     status = err.status;
     message = err.message;

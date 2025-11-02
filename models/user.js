@@ -1,29 +1,16 @@
-// User model/schema
-class User {
-  constructor(data) {
-    this._id = data._id || Date.now().toString();
-    this.name = data.name;
-    this.avatar = data.avatar;
-  }
+const mongoose = require("mongoose");
 
-  // Validation method
-  validate() {
-    const errors = [];
-    
-    if (!this.name || typeof this.name !== "string") {
-      errors.push("Name is required and must be a string");
-    } else if (this.name.trim().length < 2) {
-      errors.push("Name must be at least 2 characters");
-    } else if (this.name.trim().length > 30) {
-      errors.push("Name must be no more than 30 characters");
-    }
-    
-    if (!this.avatar || typeof this.avatar !== "string") {
-      errors.push("Avatar is required and must be a string");
-    }
-    
-    return errors;
-  }
-}
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 30,
+  },
+  avatar: {
+    type: String,
+    required: true,
+  },
+});
 
-module.exports = User;
+module.exports = mongoose.model("User", userSchema);
