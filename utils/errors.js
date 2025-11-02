@@ -21,7 +21,6 @@ const handleError = (err, req, res, _next) => {
   
   return res.status(status).json({
     message,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
 };
 
