@@ -1,7 +1,6 @@
 const express = require("express");
 const {
   getClothingItems,
-  getClothingItemById,
   createClothingItem,
   deleteClothingItem,
   likeItem,
@@ -24,8 +23,5 @@ router.put("/:itemId/likes", likeItem);
 
 // DELETE /items/:itemId/likes - unlike a clothing item
 router.delete("/:itemId/likes", unlikeItem);
-
-// GET /items/:itemId - get a single clothing item
-router.get("/:itemId", getClothingItemById);
 
 module.exports = router;

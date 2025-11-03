@@ -9,7 +9,7 @@ const handleError = (err, req, res, _next) => {
   // Handle specific error types
   if (err.name === "ValidationError") {
     status = BAD_REQUEST;
-    message = err.message;
+    message = "Validation error";
   } else if (err.name === "CastError") {
     status = BAD_REQUEST;
     message = "Invalid ID format";
