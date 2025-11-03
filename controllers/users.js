@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const { BAD_REQUEST, NOT_FOUND } = require("../utils/constants");
 
 // GET /users - get all users
 const getUsers = async (req, res, next) => {
@@ -18,7 +19,7 @@ const getUserById = async (req, res, next) => {
     return res.json(user);
   } catch (err) {
     if (err.name === "DocumentNotFoundError") {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(NOT_FOUND).json({ message: "User not found" });
     }
     return next(err);
   }
@@ -32,7 +33,7 @@ const createUser = async (req, res, next) => {
     return res.status(201).json(newUser);
   } catch (err) {
     if (err.name === "ValidationError") {
-      return res.status(400).json({ message: err.message });
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
     }
     return next(err);
   }

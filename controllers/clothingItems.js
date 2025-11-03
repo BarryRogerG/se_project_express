@@ -1,4 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
+const { BAD_REQUEST, NOT_FOUND } = require("../utils/constants");
 
 // GET /items - get all clothing items
 const getClothingItems = async (req, res, next) => {
@@ -6,20 +7,6 @@ const getClothingItems = async (req, res, next) => {
     const items = await ClothingItem.find({});
     return res.json(items);
   } catch (err) {
-    return next(err);
-  }
-};
-
-// GET /items/:itemId - get a single clothing item
-const getClothingItemById = async (req, res, next) => {
-  try {
-    const { itemId } = req.params;
-    const item = await ClothingItem.findById(itemId).orFail();
-    return res.json(item);
-  } catch (err) {
-    if (err.name === "DocumentNotFoundError") {
-      return res.status(404).json({ message: "Item not found" });
-    }
     return next(err);
   }
 };
@@ -34,7 +21,7 @@ const createClothingItem = async (req, res, next) => {
     return res.status(201).json(newItem);
   } catch (err) {
     if (err.name === "ValidationError") {
-      return res.status(400).json({ message: err.message });
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
     }
     return next(err);
   }
@@ -48,7 +35,7 @@ const deleteClothingItem = async (req, res, next) => {
     return res.json({ message: "Item deleted successfully" });
   } catch (err) {
     if (err.name === "DocumentNotFoundError") {
-      return res.status(404).json({ message: "Item not found" });
+      return res.status(NOT_FOUND).json({ message: "Item not found" });
     }
     return next(err);
   }
@@ -69,7 +56,7 @@ const likeItem = async (req, res, next) => {
     return res.json(item);
   } catch (err) {
     if (err.name === "DocumentNotFoundError") {
-      return res.status(404).json({ message: "Item not found" });
+      return res.status(NOT_FOUND).json({ message: "Item not found" });
     }
     return next(err);
   }
@@ -90,7 +77,7 @@ const unlikeItem = async (req, res, next) => {
     return res.json(item);
   } catch (err) {
     if (err.name === "DocumentNotFoundError") {
-      return res.status(404).json({ message: "Item not found" });
+      return res.status(NOT_FOUND).json({ message: "Item not found" });
     }
     return next(err);
   }
@@ -98,7 +85,6 @@ const unlikeItem = async (req, res, next) => {
 
 module.exports = {
   getClothingItems,
-  getClothingItemById,
   createClothingItem,
   deleteClothingItem,
   likeItem,
