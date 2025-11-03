@@ -1,5 +1,5 @@
 const User = require("../models/user");
-const { BAD_REQUEST, NOT_FOUND } = require("../utils/constants");
+const { BAD_REQUEST, NOT_FOUND, CREATED } = require("../utils/constants");
 
 // GET /users - get all users
 const getUsers = async (req, res, next) => {
@@ -30,7 +30,7 @@ const createUser = async (req, res, next) => {
   try {
     const { name, avatar } = req.body;
     const newUser = await User.create({ name, avatar });
-    return res.status(201).json(newUser);
+    return res.status(CREATED).json(newUser);
   } catch (err) {
     if (err.name === "ValidationError") {
       return res.status(BAD_REQUEST).json({ message: "Invalid request data" });

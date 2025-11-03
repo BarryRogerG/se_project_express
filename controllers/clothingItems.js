@@ -1,5 +1,5 @@
 const ClothingItem = require("../models/clothingItem");
-const { BAD_REQUEST, NOT_FOUND } = require("../utils/constants");
+const { BAD_REQUEST, NOT_FOUND, CREATED } = require("../utils/constants");
 
 // GET /items - get all clothing items
 const getClothingItems = async (req, res, next) => {
@@ -16,9 +16,14 @@ const createClothingItem = async (req, res, next) => {
   try {
     const { name, weather, imageUrl } = req.body;
     const owner = req.user._id;
-    
-    const newItem = await ClothingItem.create({ name, weather, imageUrl, owner });
-    return res.status(201).json(newItem);
+
+    const newItem = await ClothingItem.create({
+      name,
+      weather,
+      imageUrl,
+      owner,
+    });
+    return res.status(CREATED).json(newItem);
   } catch (err) {
     if (err.name === "ValidationError") {
       return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
@@ -46,13 +51,13 @@ const likeItem = async (req, res, next) => {
   try {
     const { itemId } = req.params;
     const userId = req.user._id;
-    
+
     const item = await ClothingItem.findByIdAndUpdate(
       itemId,
       { $addToSet: { likes: userId } },
       { new: true }
     ).orFail();
-    
+
     return res.json(item);
   } catch (err) {
     if (err.name === "DocumentNotFoundError") {
@@ -67,13 +72,13 @@ const unlikeItem = async (req, res, next) => {
   try {
     const { itemId } = req.params;
     const userId = req.user._id;
-    
+
     const item = await ClothingItem.findByIdAndUpdate(
       itemId,
       { $pull: { likes: userId } },
       { new: true }
     ).orFail();
-    
+
     return res.json(item);
   } catch (err) {
     if (err.name === "DocumentNotFoundError") {
