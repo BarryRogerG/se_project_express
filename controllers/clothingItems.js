@@ -92,6 +92,13 @@ const deleteClothingItem = (req, res) => {
     return res.status(404).json({ message: "Item not found" });
   }
 
+  const item = sampleItems[index];
+  const userId = req.user && req.user._id;
+
+  if (!userId || item.owner !== userId) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
   sampleItems.splice(index, 1);
   return res.json({ message: "Item deleted successfully" });
 };
