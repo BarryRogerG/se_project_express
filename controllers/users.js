@@ -1,5 +1,7 @@
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const { JWT_SECRET } = require("../utils/config");
 
 // GET /users - get all users
 const getUsers = async (req, res, next) => {
@@ -83,9 +85,34 @@ const updateCurrentUser = async (req, res, next) => {
   }
 };
 
+// POST /signin - user login
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: "Invalid request data" });
+    }
+
+    const user = await User.findUserByCredentials(email, password);
+
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    return res.json({ token });
+  } catch (err) {
+    if (err.status === 401) {
+      return res.status(401).json({ message: "Incorrect email or password" });
+    }
+    return next(err);
+  }
+};
+
 module.exports = {
   getUsers,
   getCurrentUser,
   createUser,
   updateCurrentUser,
+  login,
 };
