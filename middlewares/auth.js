@@ -5,6 +5,9 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith("Bearer ")) {
+    if (req.user) {
+      return next();
+    }
     return res.status(401).json({ message: "Authorization required" });
   }
 
