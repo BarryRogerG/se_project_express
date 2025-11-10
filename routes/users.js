@@ -1,19 +1,26 @@
 const express = require("express");
 const auth = require("../middlewares/auth");
-const { getUsers, getUserById, createUser } = require("../controllers/users");
+const {
+  getUsers,
+  getCurrentUser,
+  createUser,
+  updateCurrentUser,
+} = require("../controllers/users");
 
 const router = express.Router();
 
-// Protect all user routes
+// POST /users - create a new user
+router.post("/", createUser);
+
 router.use(auth);
 
 // GET /users - get all users
 router.get("/", getUsers);
 
-// GET /users/:userId - get user by ID
-router.get("/:userId", getUserById);
+// GET /users/me - get current user
+router.get("/me", getCurrentUser);
 
-// POST /users - create a new user
-router.post("/", createUser);
+// PATCH /users/me - update profile
+router.patch("/me", updateCurrentUser);
 
 module.exports = router;
