@@ -1,157 +1,143 @@
 const mongoose = require("mongoose");
+const ClothingItem = require("../models/clothingItem");
 
-// Sample data - in a real app, this would come from a database
-const sampleItems = [
-  {
-    _id: "5d8b8592978f8bd833ca8134",
-    name: "T-Shirt",
-    weather: "warm",
-    imageUrl:
-      "https://practicum-content.s3.us-west-1.amazonaws.com/software-engineer/wtwr-project/T-Shirt.png?etag=44ed1963c44ab19cd2f5011522c5fc09",
-    owner: "5d8b8592978f8bd833ca8133",
-    likes: [],
-    createdAt: new Date(),
-  },
-  {
-    _id: "5d8b8592978f8bd833ca8135",
-    name: "Shorts",
-    weather: "warm",
-    imageUrl:
-      "https://practicum-content.s3.us-west-1.amazonaws.com/software-engineer/wtwr-project/Shorts.png?etag=58345e8bef1ce5f95ac882e71d309e6c",
-    owner: "5d8b8592978f8bd833ca8133",
-    likes: [],
-    createdAt: new Date(),
-  },
-  {
-    _id: "5d8b8592978f8bd833ca8136",
-    name: "Sneakers",
-    weather: "warm",
-    imageUrl:
-      "https://practicum-content.s3.us-west-1.amazonaws.com/software-engineer/wtwr-project/Sneakers.png?etag=3efeec41c1c78b8afe26859ca7fa7b6f",
-    owner: "5d8b8592978f8bd833ca8133",
-    likes: [],
-    createdAt: new Date(),
-  },
-];
+const BAD_REQUEST = 400;
+const FORBIDDEN = 403;
+const NOT_FOUND = 404;
+const CREATED = 201;
 
-const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // GET /items - get all clothing items
-const getClothingItems = (req, res) => res.json(sampleItems);
+const getClothingItems = async (req, res, next) => {
+  try {
+    const items = await ClothingItem.find({});
+    return res.json(items);
+  } catch (err) {
+    return next(err);
+  }
+};
 
 // POST /items - create a new clothing item
-const createClothingItem = (req, res) => {
-  const { name, weather, imageUrl } = req.body;
+const createClothingItem = async (req, res, next) => {
+  try {
+    const { name, weather, imageUrl } = req.body;
+    const owner = req.user && req.user._id ? req.user._id : undefined;
 
-  // Validation
-  if (!name || !weather || !imageUrl) {
-    return res.status(400).json({ message: "Missing required fields" });
+    if (!owner) {
+      return res.status(FORBIDDEN).json({ message: "Forbidden" });
+    }
+
+    const item = await ClothingItem.create({
+      name,
+      weather,
+      imageUrl,
+      owner,
+    });
+
+    return res.status(CREATED).json(item);
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
+    }
+    return next(err);
   }
-
-  if (
-    typeof name !== "string" ||
-    typeof weather !== "string" ||
-    typeof imageUrl !== "string"
-  ) {
-    return res.status(400).json({ message: "Invalid field types" });
-  }
-
-  if (name.trim().length < 2) {
-    return res
-      .status(400)
-      .json({ message: "Name must be at least 2 characters" });
-  }
-
-  if (name.trim().length > 30) {
-    return res
-      .status(400)
-      .json({ message: "Name must be no more than 30 characters" });
-  }
-
-  const validWeatherTypes = ["hot", "warm", "cold"];
-  if (!validWeatherTypes.includes(weather)) {
-    return res.status(400).json({ message: "Invalid weather type" });
-  }
-
-  const newItem = {
-    _id: new mongoose.Types.ObjectId().toString(),
-    name: name.trim(),
-    weather,
-    imageUrl,
-    owner: "5d8b8592978f8bd833ca8133",
-    likes: [],
-    createdAt: new Date(),
-  };
-
-  sampleItems.push(newItem);
-  return res.status(201).json(newItem);
 };
 
 // DELETE /items/:itemId - delete a clothing item
-const deleteClothingItem = (req, res) => {
-  const { itemId } = req.params;
+const deleteClothingItem = async (req, res, next) => {
+  try {
+    const { itemId } = req.params;
 
-  if (!isValidObjectId(itemId)) {
-    return res.status(400).json({ message: "Invalid ID format" });
+    if (!isValidObjectId(itemId)) {
+      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+    }
+
+    const item = await ClothingItem.findById(itemId);
+
+    if (!item) {
+      return res.status(NOT_FOUND).json({ message: "Item not found" });
+    }
+
+    const userId = req.user && req.user._id;
+    if (!userId || item.owner.toString() !== userId) {
+      return res.status(FORBIDDEN).json({ message: "Forbidden" });
+    }
+
+    await item.deleteOne();
+    return res.json({ message: "Item deleted successfully" });
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+    }
+    return next(err);
   }
-
-  const index = sampleItems.findIndex((item) => item._id === itemId);
-
-  if (index === -1) {
-    return res.status(404).json({ message: "Item not found" });
-  }
-
-  const item = sampleItems[index];
-  const userId = req.user && req.user._id;
-
-  if (!userId || item.owner !== userId) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
-
-  sampleItems.splice(index, 1);
-  return res.json({ message: "Item deleted successfully" });
 };
 
 // PUT /items/:itemId/likes - like a clothing item
-const likeItem = (req, res) => {
-  const { itemId } = req.params;
+const likeItem = async (req, res, next) => {
+  try {
+    const { itemId } = req.params;
 
-  if (!isValidObjectId(itemId)) {
-    return res.status(400).json({ message: "Invalid ID format" });
+    if (!isValidObjectId(itemId)) {
+      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+    }
+
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return res.status(FORBIDDEN).json({ message: "Forbidden" });
+    }
+
+    const item = await ClothingItem.findByIdAndUpdate(
+      itemId,
+      { $addToSet: { likes: userId } },
+      { new: true }
+    );
+
+    if (!item) {
+      return res.status(NOT_FOUND).json({ message: "Item not found" });
+    }
+
+    return res.json(item);
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+    }
+    return next(err);
   }
-
-  const foundItem = sampleItems.find((item) => item._id === itemId);
-
-  if (!foundItem) {
-    return res.status(404).json({ message: "Item not found" });
-  }
-
-  const userId = "5d8b8592978f8bd833ca8133";
-  if (!foundItem.likes.includes(userId)) {
-    foundItem.likes.push(userId);
-  }
-
-  return res.json(foundItem);
 };
 
 // DELETE /items/:itemId/likes - unlike a clothing item
-const unlikeItem = (req, res) => {
-  const { itemId } = req.params;
+const unlikeItem = async (req, res, next) => {
+  try {
+    const { itemId } = req.params;
 
-  if (!isValidObjectId(itemId)) {
-    return res.status(400).json({ message: "Invalid ID format" });
+    if (!isValidObjectId(itemId)) {
+      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+    }
+
+    const userId = req.user && req.user._id;
+    if (!userId) {
+      return res.status(FORBIDDEN).json({ message: "Forbidden" });
+    }
+
+    const item = await ClothingItem.findByIdAndUpdate(
+      itemId,
+      { $pull: { likes: userId } },
+      { new: true }
+    );
+
+    if (!item) {
+      return res.status(NOT_FOUND).json({ message: "Item not found" });
+    }
+
+    return res.json(item);
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+    }
+    return next(err);
   }
-
-  const foundItem = sampleItems.find((item) => item._id === itemId);
-
-  if (!foundItem) {
-    return res.status(404).json({ message: "Item not found" });
-  }
-
-  const userId = "5d8b8592978f8bd833ca8133";
-  foundItem.likes = foundItem.likes.filter((id) => id !== userId);
-
-  return res.json(foundItem);
 };
 
 module.exports = {
