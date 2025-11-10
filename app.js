@@ -17,19 +17,21 @@ const DEFAULT_USER_AVATAR =
   "https://practicum-content.s3.us-west-1.amazonaws.com/software-engineer/wtwr-project/Sneakers.png?etag=3efeec41c1c78b8afe26859ca7fa7b6f";
 
 const ensureDefaultUser = async () => {
-  const existingUser = await User.findById(DEFAULT_USER_ID);
-  if (existingUser) {
-    return;
-  }
-
   const hashedPassword = await bcrypt.hash("default-password", 10);
-  await User.create({
-    _id: DEFAULT_USER_ID,
-    name: "test",
-    avatar: DEFAULT_USER_AVATAR,
-    email: DEFAULT_USER_EMAIL,
-    password: hashedPassword,
-  });
+  await User.findByIdAndUpdate(
+    DEFAULT_USER_ID,
+    {
+      name: "test",
+      avatar: DEFAULT_USER_AVATAR,
+      email: DEFAULT_USER_EMAIL,
+      password: hashedPassword,
+    },
+    {
+      upsert: true,
+      new: true,
+      setDefaultsOnInsert: true,
+    }
+  );
 };
 
 app.use(cors());
