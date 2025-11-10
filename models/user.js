@@ -1,29 +1,28 @@
-const mongoose = require("mongoose");
+// User model/schema
+class User {
+  constructor(data) {
+    this._id = data._id || Date.now().toString();
+    this.name = data.name;
+    this.avatar = data.avatar;
+  }
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    minlength: 2,
-    maxlength: 30,
-  },
-  avatar: {
-    type: String,
-    required: true,
-    validate: {
-      validator(v) {
-        try {
-          const url = new URL(v);
-          if (!["http:", "https:"].includes(url.protocol)) return false;
-          if (!url.hostname || !url.hostname.includes(".")) return false;
-          return true;
-        } catch (e) {
-          return false;
-        }
-      },
-      message: "Invalid avatar URL format",
-    },
-  },
-});
+  // Validation method
+  validate() {
+    const errors = [];
 
-module.exports = mongoose.model("User", userSchema);
+    if (!this.name || typeof this.name !== "string") {
+      errors.push("Name is required and must be a string");
+    } else if (this.name.trim().length < 2) {
+      errors.push("Name must be at least 2 characters");
+    } else if (this.name.trim().length > 30) {
+      errors.push("Name must be no more than 30 characters");
+    }
+
+    if (!this.avatar || typeof this.avatar !== "string") {
+      errors.push("Avatar is required and must be a string");
+    }
+
+    return errors;
+  }
+}
+module.exports = User;

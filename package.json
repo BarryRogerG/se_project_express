@@ -23,7 +23,8 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "mongoose": "^8.0.0",
-    "validator": "^13.11.0"
+    "validator": "^13.11.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "eslint": "^8.57.1",

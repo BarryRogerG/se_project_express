@@ -1,25 +1,16 @@
-const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
-} = require("./constants");
-
 // Error handling middleware
-const handleError = (err, req, res, _next) => {
+const handleError = (err, req, res) => {
   // Default error
-  let status = INTERNAL_SERVER_ERROR;
+  let status = 500;
   let message = "Internal Server Error";
 
   // Handle specific error types
   if (err.name === "ValidationError") {
-    status = BAD_REQUEST;
-    message = "Validation error";
+    status = 400;
+    message = err.message;
   } else if (err.name === "CastError") {
-    status = BAD_REQUEST;
+    status = 400;
     message = "Invalid ID format";
-  } else if (err.name === "DocumentNotFoundError") {
-    status = NOT_FOUND;
-    message = "Not found";
   } else if (err.status) {
     status = err.status;
     message = err.message;
@@ -27,12 +18,13 @@ const handleError = (err, req, res, _next) => {
 
   return res.status(status).json({
     message,
+    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
 };
 
 // 404 handler
 const handleNotFound = (req, res) =>
-  res.status(NOT_FOUND).json({ message: "Route not found" });
+  res.status(404).json({ message: "Route not found" });
 
 module.exports = {
   handleError,
