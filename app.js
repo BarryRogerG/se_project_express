@@ -17,9 +17,15 @@ const DEFAULT_USER_AVATAR =
   "https://practicum-content.s3.us-west-1.amazonaws.com/software-engineer/wtwr-project/Sneakers.png?etag=3efeec41c1c78b8afe26859ca7fa7b6f";
 
 const ensureDefaultUser = async () => {
+  await User.deleteMany({
+    email: DEFAULT_USER_EMAIL,
+    _id: { $ne: DEFAULT_USER_ID },
+  });
+
   const hashedPassword = await bcrypt.hash("default-password", 10);
-  await User.findByIdAndUpdate(
-    DEFAULT_USER_ID,
+
+  await User.findOneAndUpdate(
+    { _id: DEFAULT_USER_ID },
     {
       name: "test",
       avatar: DEFAULT_USER_AVATAR,
@@ -30,6 +36,7 @@ const ensureDefaultUser = async () => {
       upsert: true,
       new: true,
       setDefaultsOnInsert: true,
+      overwrite: true,
     }
   );
 };
