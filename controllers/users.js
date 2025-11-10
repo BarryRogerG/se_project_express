@@ -45,7 +45,7 @@ const getUserById = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.json(user);
+    return res.json({ data: user });
   } catch (err) {
     if (err.name === "CastError") {
       return res.status(400).json({ message: "Invalid ID format" });
