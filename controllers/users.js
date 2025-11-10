@@ -31,6 +31,11 @@ const getCurrentUser = async (req, res, next) => {
 const createUser = async (req, res, next) => {
   try {
     const { name, avatar, email, password } = req.body;
+
+    if (!name || !avatar || !email || !password) {
+      return res.status(400).json({ message: "Invalid request data" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({
       name,
