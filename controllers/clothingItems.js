@@ -1,7 +1,9 @@
+const mongoose = require("mongoose");
+
 // Sample data - in a real app, this would come from a database
 const sampleItems = [
   {
-    _id: "1",
+    _id: "5d8b8592978f8bd833ca8134",
     name: "T-Shirt",
     weather: "warm",
     imageUrl:
@@ -11,7 +13,7 @@ const sampleItems = [
     createdAt: new Date(),
   },
   {
-    _id: "2",
+    _id: "5d8b8592978f8bd833ca8135",
     name: "Shorts",
     weather: "warm",
     imageUrl:
@@ -21,7 +23,7 @@ const sampleItems = [
     createdAt: new Date(),
   },
   {
-    _id: "3",
+    _id: "5d8b8592978f8bd833ca8136",
     name: "Sneakers",
     weather: "warm",
     imageUrl:
@@ -31,6 +33,8 @@ const sampleItems = [
     createdAt: new Date(),
   },
 ];
+
+const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
 
 // GET /items - get all clothing items
 const getClothingItems = (req, res) => res.json(sampleItems);
@@ -70,7 +74,7 @@ const createClothingItem = (req, res) => {
   }
 
   const newItem = {
-    _id: Date.now().toString(),
+    _id: new mongoose.Types.ObjectId().toString(),
     name: name.trim(),
     weather,
     imageUrl,
@@ -86,6 +90,11 @@ const createClothingItem = (req, res) => {
 // DELETE /items/:itemId - delete a clothing item
 const deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
+
+  if (!isValidObjectId(itemId)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
+
   const index = sampleItems.findIndex((item) => item._id === itemId);
 
   if (index === -1) {
@@ -106,6 +115,11 @@ const deleteClothingItem = (req, res) => {
 // PUT /items/:itemId/likes - like a clothing item
 const likeItem = (req, res) => {
   const { itemId } = req.params;
+
+  if (!isValidObjectId(itemId)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
+
   const foundItem = sampleItems.find((item) => item._id === itemId);
 
   if (!foundItem) {
@@ -123,6 +137,11 @@ const likeItem = (req, res) => {
 // DELETE /items/:itemId/likes - unlike a clothing item
 const unlikeItem = (req, res) => {
   const { itemId } = req.params;
+
+  if (!isValidObjectId(itemId)) {
+    return res.status(400).json({ message: "Invalid ID format" });
+  }
+
   const foundItem = sampleItems.find((item) => item._id === itemId);
 
   if (!foundItem) {
