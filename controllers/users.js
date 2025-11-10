@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
@@ -20,6 +21,30 @@ const getCurrentUser = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    return res.json(user);
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+    return next(err);
+  }
+};
+
+// GET /users/:userId - get user by id
+const getUserById = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid ID format" });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     return res.json(user);
   } catch (err) {
     if (err.name === "CastError") {
@@ -112,6 +137,7 @@ const login = async (req, res, next) => {
 module.exports = {
   getUsers,
   getCurrentUser,
+  getUserById,
   createUser,
   updateCurrentUser,
   login,

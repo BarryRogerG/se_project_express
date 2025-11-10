@@ -3,6 +3,7 @@ const auth = require("../middlewares/auth");
 const {
   getUsers,
   getCurrentUser,
+  getUserById,
   createUser,
   updateCurrentUser,
 } = require("../controllers/users");
@@ -19,6 +20,9 @@ router.get("/", getUsers);
 
 // GET /users/me - get current user
 router.get("/me", getCurrentUser);
+
+// GET /users/:userId - get user by ID
+router.get("/:userId", getUserById);
 
 // PATCH /users/me - update profile
 router.patch("/me", updateCurrentUser);
