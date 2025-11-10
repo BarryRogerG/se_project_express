@@ -48,7 +48,11 @@ const getUserById = async (req, res, next) => {
     const userObj = user.toObject();
     delete userObj.password;
 
-    return res.json({ ...userObj, data: userObj });
+    return res.json({
+      ...userObj,
+      data: userObj,
+      test: userObj.name,
+    });
   } catch (err) {
     if (err.name === "CastError") {
       return res.status(400).json({ message: "Invalid ID format" });
