@@ -10,22 +10,14 @@ const {
 
 const router = express.Router();
 
-// POST /users - create a new user
+// Public routes
 router.post("/", createUser);
-
 router.get("/:userId", getUserById);
 
+// Protected routes
 router.use(auth);
-
-// GET /users - get all users
 router.get("/", getUsers);
-
-// GET /users/me - get current user
 router.get("/me", getCurrentUser);
-
-// GET /users/:userId - get user by ID
-
-// PATCH /users/me - update profile
 router.patch("/me", updateCurrentUser);
 
 module.exports = router;
