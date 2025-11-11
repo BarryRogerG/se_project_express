@@ -13,6 +13,8 @@ const router = express.Router();
 // POST /users - create a new user
 router.post("/", createUser);
 
+router.get("/:userId", getUserById);
+
 router.use(auth);
 
 // GET /users - get all users
@@ -22,7 +24,6 @@ router.get("/", getUsers);
 router.get("/me", getCurrentUser);
 
 // GET /users/:userId - get user by ID
-router.get("/:userId", getUserById);
 
 // PATCH /users/me - update profile
 router.patch("/me", updateCurrentUser);
