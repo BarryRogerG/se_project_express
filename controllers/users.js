@@ -1,11 +1,16 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const validator = require("validator");
 const User = require("../models/user");
 const { JWT_SECRET } = require("../utils/config");
-
-const DEFAULT_USER_ID = "5d8b8592978f8bd833ca8133";
-const DEFAULT_USER_EMAIL = "test@example.com";
+const {
+  BAD_REQUEST,
+  NOT_FOUND,
+  CONFLICT,
+  CREATED,
+  UNAUTHORIZED,
+} = require("../utils/constants");
 
 // GET /users - get all users
 const getUsers = async (req, res, next) => {
@@ -22,114 +27,75 @@ const getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(NOT_FOUND).json({ message: "User not found" });
     }
     return res.json(user);
   } catch (err) {
     if (err.name === "CastError") {
-      return res.status(400).json({ message: "Invalid ID format" });
+      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
     }
     return next(err);
   }
 };
 
-// GET /users/:userId - get user by id
-const getUserById = async (req, res, next) => {
-  try {
-    const { userId } = req.params;
-
-    if (userId === "null" || userId === "undefined" || userId === "me") {
-      const defaultUser = await User.findById(DEFAULT_USER_ID).lean();
-      if (defaultUser) {
-        delete defaultUser.password;
-        return res.json({ data: defaultUser });
-      }
-      const fallbackUser = await User.findOne({ email: DEFAULT_USER_EMAIL })
-        .lean()
-        .exec();
-      if (fallbackUser) {
-        delete fallbackUser.password;
-        return res.json({ data: fallbackUser });
-      }
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ message: "Invalid ID format" });
-    }
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const userObj = user.toObject();
-    delete userObj.password;
-
-    return res.json({ data: userObj });
-  } catch (err) {
-    if (err.name === "CastError") {
-      return res.status(400).json({ message: "Invalid ID format" });
-    }
-    return next(err);
-  }
-};
-
-// POST /users - create a new user
+// POST /signup - create a new user
 const createUser = async (req, res, next) => {
   try {
     const { name, avatar, email, password } = req.body;
 
-    if (!name || !avatar) {
-      return res.status(400).json({ message: "Invalid request data" });
+    if (!name || !avatar || !email || !password) {
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
     }
 
-    if (typeof name !== "string" || typeof avatar !== "string") {
-      return res.status(400).json({ message: "Invalid request data" });
+    if (
+      typeof name !== "string" ||
+      typeof avatar !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string"
+    ) {
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
     }
 
-    const userData = {
-      name,
-      avatar,
-    };
+    const trimmedName = name.trim();
+    const trimmedAvatar = avatar.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
 
-    const emailProvided = typeof email === "string" && email.trim().length > 0;
-    const passwordProvided =
-      typeof password === "string" && password.trim().length > 0;
+    if (
+      !trimmedName.length ||
+      !trimmedAvatar.length ||
+      !trimmedEmail.length ||
+      !trimmedPassword.length
+    ) {
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
+    }
 
-    const uniqueSuffix = new mongoose.Types.ObjectId().toString();
+    if (!validator.isEmail(trimmedEmail)) {
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
+    }
 
-    const userEmail = emailProvided
-      ? email
-      : `user_${uniqueSuffix}@example.com`;
-
-    const userPassword = passwordProvided
-      ? password
-      : `pass_${uniqueSuffix}`;
-
-    const hashedPassword = await bcrypt.hash(userPassword, 10);
-
-    userData.email = userEmail;
-    userData.password = hashedPassword;
-
-    const existingByEmail = await User.findOne({ email: userEmail });
+    const existingByEmail = await User.findOne({ email: trimmedEmail });
     if (existingByEmail) {
-      return res.status(409).json({ message: "User already exists" });
+      return res.status(CONFLICT).json({ message: "User already exists" });
     }
+
+    const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
 
     const user = await User.create({
-      ...userData,
+      name: trimmedName,
+      avatar: trimmedAvatar,
+      email: trimmedEmail,
+      password: hashedPassword,
     });
     const userObj = user.toObject();
     delete userObj.password;
-    return res.status(201).json(userObj);
+    return res.status(CREATED).json(userObj);
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(409).json({ message: "User already exists" });
+      return res.status(CONFLICT).json({ message: "User already exists" });
     }
     if (err.name === "ValidationError") {
-      return res.status(400).json({ message: "Invalid request data" });
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
     }
     return next(err);
   }
@@ -146,16 +112,16 @@ const updateCurrentUser = async (req, res, next) => {
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(NOT_FOUND).json({ message: "User not found" });
     }
 
     return res.json(user);
   } catch (err) {
     if (err.name === "ValidationError") {
-      return res.status(400).json({ message: "Invalid request data" });
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
     }
     if (err.name === "CastError") {
-      return res.status(400).json({ message: "Invalid ID format" });
+      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
     }
     return next(err);
   }
@@ -167,7 +133,7 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Invalid request data" });
+      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
     }
 
     const user = await User.findUserByCredentials(email, password);
@@ -178,8 +144,10 @@ const login = async (req, res, next) => {
 
     return res.json({ token });
   } catch (err) {
-    if (err.status === 401) {
-      return res.status(401).json({ message: "Incorrect email or password" });
+    if (err.status === UNAUTHORIZED) {
+      return res
+        .status(UNAUTHORIZED)
+        .json({ message: "Incorrect email or password" });
     }
     return next(err);
   }
@@ -188,7 +156,6 @@ const login = async (req, res, next) => {
 module.exports = {
   getUsers,
   getCurrentUser,
-  getUserById,
   createUser,
   updateCurrentUser,
   login,
