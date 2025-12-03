@@ -18,21 +18,28 @@ app.use(handleNotFound);
 app.use(handleError);
 
 const startServer = () => {
-  app.listen(PORT, () => {
-    // eslint-disable-next-line no-console
-    console.log(`App listening at port ${PORT}`);
-  });
+  if (process.env.NODE_ENV !== "test") {
+    app.listen(PORT, () => {
+      // eslint-disable-next-line no-console
+      console.log(`App listening at port ${PORT}`);
+    });
+  }
 };
 
-mongoose
-  .connect(MONGODB_URI)
-  .then(() => {
-    // eslint-disable-next-line no-console
-    console.log("Connected to MongoDB");
-    startServer();
-  })
-  .catch((err) => {
-    // eslint-disable-next-line no-console
-    console.error("Failed to connect to MongoDB", err);
-    startServer();
-  });
+// Only connect to MongoDB if not running tests
+if (process.env.NODE_ENV !== "test") {
+  mongoose
+    .connect(MONGODB_URI)
+    .then(() => {
+      // eslint-disable-next-line no-console
+      console.log("Connected to MongoDB");
+      startServer();
+    })
+    .catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error("Failed to connect to MongoDB", err);
+      startServer();
+    });
+}
+
+module.exports = app;
