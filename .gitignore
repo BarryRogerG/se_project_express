@@ -24,3 +24,7 @@ jspm_packages/
 # OS files
 Thumbs.db
 desktop.ini
+
+.env
+secret-key.txt
+*.key
