@@ -14,3 +14,11 @@ Before committing your code, make sure you edit the file `sprint.txt` in the roo
 
 Check out this video (https://drive.google.com/file/d/1A2FPT52qKKYhKdmZc3IVhaY5ulXLbEsX/view?usp=sharing), where I describe my 
  project and some challenges I faced while building it.
+
+## Deployment
+
+**Deployed Project Domain:** https://bestbudwtwr.ignorelist.com
+
+**Frontend GitHub Repository:** https://github.com/BarryRogerG/se_project_react
+
+**Project Pitch Video:** https://drive.google.com/file/d/1A2FPT52qKKYhKdmZc3IVhaY5ulXLbEsX/view?usp=sharing

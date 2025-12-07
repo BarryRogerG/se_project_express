@@ -13,6 +13,13 @@ const { PORT = 3001, MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } =
 app.use(cors());
 app.use(express.json());
 
+// Crash test route for PM2 testing (remove after code review)
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Server will crash now');
+  }, 0);
+});
+
 app.use("/", routes);
 
 app.use(handleNotFound);
