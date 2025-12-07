@@ -7,6 +7,7 @@ const {
   likeItem,
   unlikeItem,
 } = require("../controllers/clothingItems");
+const { validateCreateItem, validateItemId } = require("../middlewares/validation");
 
 const router = express.Router();
 
@@ -14,15 +15,15 @@ const router = express.Router();
 router.get("/", getClothingItems);
 
 // POST /items - create a new clothing item
-router.post("/", auth, createClothingItem);
+router.post("/", auth, validateCreateItem, createClothingItem);
 
 // DELETE /items/:itemId - delete a clothing item
-router.delete("/:itemId", auth, deleteClothingItem);
+router.delete("/:itemId", auth, validateItemId, deleteClothingItem);
 
 // PUT /items/:itemId/likes - like a clothing item
-router.put("/:itemId/likes", auth, likeItem);
+router.put("/:itemId/likes", auth, validateItemId, likeItem);
 
 // DELETE /items/:itemId/likes - unlike a clothing item
-router.delete("/:itemId/likes", auth, unlikeItem);
+router.delete("/:itemId/likes", auth, validateItemId, unlikeItem);
 
 module.exports = router;

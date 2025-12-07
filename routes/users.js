@@ -6,6 +6,7 @@ const {
   createUser,
   updateCurrentUser,
 } = require("../controllers/users");
+const { validateUpdateUser } = require("../middlewares/validation");
 
 const router = express.Router();
 
@@ -16,6 +17,6 @@ router.post("/", createUser);
 router.use(auth);
 router.get("/", getUsers);
 router.get("/me", getCurrentUser);
-router.patch("/me", updateCurrentUser);
+router.patch("/me", validateUpdateUser, updateCurrentUser);
 
 module.exports = router;

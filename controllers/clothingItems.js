@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 const ClothingItem = require("../models/clothingItem");
+const {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} = require("../utils/errors");
 
-const BAD_REQUEST = 400;
-const FORBIDDEN = 403;
-const NOT_FOUND = 404;
 const CREATED = 201;
-
-const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // GET /items - get all clothing items
 const getClothingItems = async (req, res, next) => {
@@ -25,7 +25,7 @@ const createClothingItem = async (req, res, next) => {
     const owner = req.user && req.user._id ? req.user._id : undefined;
 
     if (!owner) {
-      return res.status(FORBIDDEN).json({ message: "Forbidden" });
+      return next(new ForbiddenError("Forbidden"));
     }
 
     const item = await ClothingItem.create({
@@ -38,7 +38,7 @@ const createClothingItem = async (req, res, next) => {
     return res.status(CREATED).json(item);
   } catch (err) {
     if (err.name === "ValidationError") {
-      return res.status(BAD_REQUEST).json({ message: "Invalid request data" });
+      return next(new BadRequestError("Invalid request data"));
     }
     return next(err);
   }
@@ -48,27 +48,24 @@ const createClothingItem = async (req, res, next) => {
 const deleteClothingItem = async (req, res, next) => {
   try {
     const { itemId } = req.params;
-
-    if (!isValidObjectId(itemId)) {
-      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
-    }
+    // Validation middleware handles itemId format validation
 
     const item = await ClothingItem.findById(itemId);
 
     if (!item) {
-      return res.status(NOT_FOUND).json({ message: "Item not found" });
+      return next(new NotFoundError("Item not found"));
     }
 
     const userId = req.user && req.user._id;
     if (!userId || item.owner.toString() !== userId) {
-      return res.status(FORBIDDEN).json({ message: "Forbidden" });
+      return next(new ForbiddenError("Forbidden"));
     }
 
     await item.deleteOne();
     return res.json({ message: "Item deleted successfully" });
   } catch (err) {
     if (err.name === "CastError") {
-      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+      return next(new BadRequestError("Invalid ID format"));
     }
     return next(err);
   }
@@ -78,14 +75,11 @@ const deleteClothingItem = async (req, res, next) => {
 const likeItem = async (req, res, next) => {
   try {
     const { itemId } = req.params;
-
-    if (!isValidObjectId(itemId)) {
-      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
-    }
+    // Validation middleware handles itemId format validation
 
     const userId = req.user && req.user._id;
     if (!userId) {
-      return res.status(FORBIDDEN).json({ message: "Forbidden" });
+      return next(new ForbiddenError("Forbidden"));
     }
 
     const item = await ClothingItem.findByIdAndUpdate(
@@ -95,13 +89,13 @@ const likeItem = async (req, res, next) => {
     );
 
     if (!item) {
-      return res.status(NOT_FOUND).json({ message: "Item not found" });
+      return next(new NotFoundError("Item not found"));
     }
 
     return res.json(item);
   } catch (err) {
     if (err.name === "CastError") {
-      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+      return next(new BadRequestError("Invalid ID format"));
     }
     return next(err);
   }
@@ -111,14 +105,11 @@ const likeItem = async (req, res, next) => {
 const unlikeItem = async (req, res, next) => {
   try {
     const { itemId } = req.params;
-
-    if (!isValidObjectId(itemId)) {
-      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
-    }
+    // Validation middleware handles itemId format validation
 
     const userId = req.user && req.user._id;
     if (!userId) {
-      return res.status(FORBIDDEN).json({ message: "Forbidden" });
+      return next(new ForbiddenError("Forbidden"));
     }
 
     const item = await ClothingItem.findByIdAndUpdate(
@@ -128,13 +119,13 @@ const unlikeItem = async (req, res, next) => {
     );
 
     if (!item) {
-      return res.status(NOT_FOUND).json({ message: "Item not found" });
+      return next(new NotFoundError("Item not found"));
     }
 
     return res.json(item);
   } catch (err) {
     if (err.name === "CastError") {
-      return res.status(BAD_REQUEST).json({ message: "Invalid ID format" });
+      return next(new BadRequestError("Invalid ID format"));
     }
     return next(err);
   }

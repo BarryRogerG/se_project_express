@@ -3,7 +3,9 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const routes = require("./routes");
-const { handleError, handleNotFound } = require("./utils/errors");
+const { handleNotFound } = require("./utils/errors");
+const errorHandler = require("./middlewares/error-handler");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 
 const app = express();
 
@@ -12,6 +14,9 @@ const { PORT = 3001, MONGODB_URI = "mongodb://127.0.0.1:27017/wtwr_db" } =
 
 app.use(cors());
 app.use(express.json());
+
+// Request logging (before routes)
+app.use(requestLogger);
 
 // Crash test route for PM2 testing (remove after code review)
 app.get('/crash-test', () => {
@@ -22,8 +27,12 @@ app.get('/crash-test', () => {
 
 app.use("/", routes);
 
+// Error logging (before error handler)
+app.use(errorLogger);
+
+// 404 handler and error handler (must be last)
 app.use(handleNotFound);
-app.use(handleError);
+app.use(errorHandler);
 
 const startServer = () => {
   if (process.env.NODE_ENV !== "test") {

@@ -1,32 +1,53 @@
-// Error handling middleware
-const handleError = (err, req, res, next) => {
-  // Default error
-  let status = 500;
-  let message = "Internal Server Error";
-
-  // Handle specific error types
-  if (err.name === "ValidationError") {
-    status = 400;
-    message = err.message;
-  } else if (err.name === "CastError") {
-    status = 400;
-    message = "Invalid ID format";
-  } else if (err.status) {
-    status = err.status;
-    message = err.message;
+// Custom error constructors
+class BadRequestError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "BadRequestError";
+    this.status = 400;
   }
+}
 
-  return res.status(status).json({
-    message,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-  });
-};
+class UnauthorizedError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "UnauthorizedError";
+    this.status = 401;
+  }
+}
+
+class ForbiddenError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ForbiddenError";
+    this.status = 403;
+  }
+}
+
+class NotFoundError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "NotFoundError";
+    this.status = 404;
+  }
+}
+
+class ConflictError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "ConflictError";
+    this.status = 409;
+  }
+}
 
 // 404 handler
 const handleNotFound = (req, res) =>
   res.status(404).json({ message: "Route not found" });
 
 module.exports = {
-  handleError,
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
   handleNotFound,
 };
