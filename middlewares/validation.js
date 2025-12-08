@@ -79,7 +79,7 @@ const validateCreateItem = celebrate({
 
 const validateItemId = celebrate({
   params: Joi.object().keys({
-    itemId: Joi.string().hex().length(24).required().messages({
+    id: Joi.string().hex().length(24).required().messages({
       "string.hex": "Item ID must be a valid MongoDB ObjectId",
       "string.length": "Item ID must be 24 characters long",
       "any.required": "Item ID is required",

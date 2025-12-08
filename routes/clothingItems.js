@@ -17,13 +17,13 @@ router.get("/", getClothingItems);
 // POST /items - create a new clothing item
 router.post("/", auth, validateCreateItem, createClothingItem);
 
-// DELETE /items/:itemId - delete a clothing item
-router.delete("/:itemId", auth, validateItemId, deleteClothingItem);
+// DELETE /items/:id - delete a clothing item
+router.delete("/:id", auth, validateItemId, deleteClothingItem);
 
-// PUT /items/:itemId/likes - like a clothing item
-router.put("/:itemId/likes", auth, validateItemId, likeItem);
+// PUT /items/:id/likes - like a clothing item
+router.put("/:id/likes", auth, validateItemId, likeItem);
 
-// DELETE /items/:itemId/likes - unlike a clothing item
-router.delete("/:itemId/likes", auth, validateItemId, unlikeItem);
+// DELETE /items/:id/likes - unlike a clothing item
+router.delete("/:id/likes", auth, validateItemId, unlikeItem);
 
 module.exports = router;

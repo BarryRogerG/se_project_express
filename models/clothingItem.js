@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
-
-const urlRegex = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)$/;
+const validator = require("validator");
 
 const clothingItemSchema = new mongoose.Schema(
   {
@@ -20,7 +19,7 @@ const clothingItemSchema = new mongoose.Schema(
       type: String,
       required: true,
       validate: {
-        validator: (v) => urlRegex.test(v),
+        validator: validator.isURL,
         message: "Image URL must be valid",
       },
     },
@@ -29,13 +28,16 @@ const clothingItemSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    likes: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        default: [],
-      },
-    ],
+    likes: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      required: true,
+      default: [],
+    },
     createdAt: {
       type: Date,
       default: Date.now,

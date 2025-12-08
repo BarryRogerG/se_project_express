@@ -17,6 +17,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
+    "lint": "eslint .",
     "test": "jest"
   },
   "jest": {

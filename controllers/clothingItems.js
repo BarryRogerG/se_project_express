@@ -44,10 +44,10 @@ const createClothingItem = async (req, res, next) => {
   }
 };
 
-// DELETE /items/:itemId - delete a clothing item
+// DELETE /items/:id - delete a clothing item
 const deleteClothingItem = async (req, res, next) => {
   try {
-    const { itemId } = req.params;
+    const { id: itemId } = req.params;
     // Validation middleware handles itemId format validation
 
     const item = await ClothingItem.findById(itemId);
@@ -71,10 +71,10 @@ const deleteClothingItem = async (req, res, next) => {
   }
 };
 
-// PUT /items/:itemId/likes - like a clothing item
+// PUT /items/:id/likes - like a clothing item
 const likeItem = async (req, res, next) => {
   try {
-    const { itemId } = req.params;
+    const { id: itemId } = req.params;
     // Validation middleware handles itemId format validation
 
     const userId = req.user && req.user._id;
@@ -101,10 +101,10 @@ const likeItem = async (req, res, next) => {
   }
 };
 
-// DELETE /items/:itemId/likes - unlike a clothing item
+// DELETE /items/:id/likes - unlike a clothing item
 const unlikeItem = async (req, res, next) => {
   try {
-    const { itemId } = req.params;
+    const { id: itemId } = req.params;
     // Validation middleware handles itemId format validation
 
     const userId = req.user && req.user._id;

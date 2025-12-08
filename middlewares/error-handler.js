@@ -5,7 +5,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Default error
   let status = 500;
-  let message = "Internal Server Error";
+  let message = "An error has occurred on the server.";
 
   // Handle specific error types
   if (err.name === "ValidationError") {
@@ -33,7 +33,6 @@ const errorHandler = (err, req, res, next) => {
   // Send response with correct status code and message
   return res.status(status).json({
     message,
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
   });
 };
 
