@@ -53,6 +53,6 @@ _Note: Screenshots and GIFs demonstrating the project features can be added here
 
 ## Deployed Server
 
-The server is deployed and accessible at: [Your deployed server URL here]
+The server is deployed and accessible at: https://api.bestbudwtwr.ignorelist.com
 
 _Note: Please update this with your actual deployed server URL._
